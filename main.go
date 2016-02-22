@@ -6,22 +6,17 @@ import (
 	"net/http"
 )
 
-type messageHandler struct {
-	message string
-}
-
-func (m *messageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, m.message)
+func messageHandler(message string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, message)
+	})
 }
 
 func main() {
 	mux := http.NewServeMux()
 
-	mh1 := &messageHandler{"Welcome to Go Web Development"}
-	mux.Handle("/welcome", mh1)
-
-	mh2 := &messageHandler{"net/http is Awesome"}
-	mux.Handle("/message", mh2)
+	mux.Handle("/welcome", messageHandler("Welcome to Go Web Development"))
+	mux.Handle("/", messageHandler("Welcome to the Homepage"))
 
 	log.Println("Listening on port 8080....")
 	http.ListenAndServe(":8080", mux)
