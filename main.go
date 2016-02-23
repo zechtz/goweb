@@ -4,20 +4,26 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
-func messageHandler(message string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, message)
-	})
+func messageHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Welcome to Go Web Development")
 }
 
 func main() {
-	mux := http.NewServeMux()
+	// mux := http.NewServeMux()
 
-	mux.Handle("/welcome", messageHandler("Welcome to Go Web Development"))
-	mux.Handle("/", messageHandler("Welcome to the Homepage"))
+	// mux.Handle("/welcome", messageHandler)
+	http.HandleFunc("/welcome", messageHandler)
+
+	server := &http.Server{
+		Addr:           ":8080",
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
 
 	log.Println("Listening on port 8080....")
-	http.ListenAndServe(":8080", mux)
+	server.ListenAndServe()
 }
